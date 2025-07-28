@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(venvScripts:*)",
+      "Bash(.venvScriptsactivate.bat)",
+      "Bash(call venvScriptsactivate)",
+      "Bash(powershell:*)",
+      "Bash(mkdir:*)",
+      "Bash(md:*)",
+      "Bash(md src\\escape_room_sim\\agents:*)"
+    ],
+    "deny": []
+  }
+}

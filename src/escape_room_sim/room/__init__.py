@@ -1,0 +1,1 @@
+"""Room state and game mechanics."""
