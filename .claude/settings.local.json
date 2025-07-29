@@ -8,7 +8,12 @@
       "Bash(powershell:*)",
       "Bash(mkdir:*)",
       "Bash(md:*)",
-      "Bash(md src\\escape_room_sim\\agents:*)"
+      "Bash(md src\\escape_room_sim\\agents:*)",
+      "mcp__grep__searchGitHub",
+      "Bash(venv/Scripts/python.exe main.py:*)",
+      "Bash(venv/Scripts/pip.exe install:*)",
+      "mcp__Ref__ref_search_documentation",
+      "mcp__Ref__ref_read_url"
     ],
     "deny": []
   }
