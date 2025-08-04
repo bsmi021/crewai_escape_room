@@ -28,10 +28,16 @@ escape_room_sim/
 │   ├── agents/          # Agent definitions (strategist, mediator, survivor)
 │   ├── tasks/           # Task definitions (assessment, planning, execution)
 │   ├── room/            # Room state and mechanics
-│   ├── memory/          # Simple file-based memory system
-│   └── simulation/      # Iterative simulation engine
-├── tests/               # Comprehensive test suite (100% coverage target)
-├── data/                # Game state, conversation logs, agent memories
+│   ├── memory/          # File-based memory system with persistent storage
+│   ├── simulation/      # Iterative simulation engine with relationship tracking
+│   ├── competitive/     # Competitive dynamics (trust, resources, scenarios)
+│   └── utils/           # Utility functions (LLM config, helpers)
+├── tests/               # Comprehensive test suite with unit and integration tests
+│   ├── unit/            # Unit tests for individual components
+│   ├── integration/     # Integration tests for system interactions
+│   └── fixtures/        # Test fixtures and data
+├── data/                # Game state, conversation logs, agent memories, results
+├── specs/               # Technical specifications and enhancement documents
 └── scripts/             # Development and deployment scripts
 ```
 
@@ -69,6 +75,7 @@ python -m mypy src/                                    # Type check
 
 # Run specific test categories
 python tests/run_tests.py tests/unit/test_strategist_agent.py    # Single test file
+python tests/run_all_tests.py                                   # Comprehensive test runner
 python -m pytest tests/unit/ -v                                  # All unit tests
 python -m pytest tests/integration/ -v                           # All integration tests
 python -m pytest -k "strategist" -v                             # Test pattern matching
@@ -83,6 +90,7 @@ Currently installed packages (see requirements.txt for exact versions):
 - `langchain-community>=0.0.21` - LangChain integrations
 - `langchain-ollama>=0.1.3` - Local LLM support
 - `numpy>=1.26.0` - Numerical computing
+- `chromadb` - Vector database for semantic memory storage
 
 **LLM API Support:**
 - `openai>=1.97.0` - OpenAI API client
@@ -134,19 +142,26 @@ Currently installed packages (see requirements.txt for exact versions):
 - ✅ Comprehensive test suite (unit + integration tests) with >90% coverage
 - ✅ Development tooling (pytest, black, flake8, mypy)
 - ✅ Multi-LLM API support (Gemini preferred, OpenAI/Anthropic fallback)
+- ✅ Competitive dynamics system with trust tracking and resource management
+- ✅ Advanced memory systems including survival memory and relationship tracking
+- ✅ ChromaDB integration for vector embeddings and similarity search
 
 **Current Capabilities:**
 - Run full escape room simulations with configurable iterations
 - Agents learn and adapt strategies across multiple rounds
-- Memory persistence between simulation runs
+- Memory persistence between simulation runs with vector embeddings
 - Detailed logging and result analysis
 - Deadlock detection and natural stopping conditions
+- Trust dynamics and relationship evolution between agents
+- Resource scarcity and competition mechanics
+- Scenario generation for varied simulation experiences
 
-**Future Enhancement Opportunities:**
-- Advanced room puzzles and mechanics
-- Web-based user interface
-- Real-time collaboration features
-- Additional AI model integrations
+**Recent Enhancements (as of 2025-08-04):**
+- Enhanced competitive mechanics with trust and resource systems
+- Advanced test coverage including edge cases and integration scenarios
+- ChromaDB integration for semantic memory search
+- Relationship tracking and trust evolution systems
+- Comprehensive specifications for future realism enhancements
 
 ## Environment Setup Requirements
 
@@ -167,6 +182,34 @@ Currently installed packages (see requirements.txt for exact versions):
 - Memory-enabled agents that learn from previous iterations and failures
 - Iterative simulation engine using `SimpleEscapeSimulation` class
 - JSON-based persistence for game state, agent memories, and results
+- ChromaDB integration for semantic memory storage and retrieval
 - Rich console interface with interactive configuration
-- Comprehensive test coverage with `tests/run_tests.py` script
+- Comprehensive test coverage with `tests/run_tests.py` and `tests/run_all_tests.py` scripts
 - Modular architecture allowing easy extension of agents, tasks, and mechanics
+- Competitive dynamics with trust tracking, resource management, and relationship evolution
+
+## Advanced Features
+
+**Competitive Dynamics System:**
+- Trust tracking between agents with dynamic relationship evolution
+- Resource scarcity and competition mechanics
+- Scenario generation for varied simulation experiences
+- Survival memory system that persists learned strategies
+
+**Memory and Learning:**
+- ChromaDB vector database for semantic similarity search
+- Persistent memory across simulation runs
+- Agent relationship tracking and trust evolution
+- Context-aware memory retrieval based on current situations
+
+**Testing Infrastructure:**
+- Unit tests for individual components (agents, tasks, competitive systems)
+- Integration tests for system interactions and workflows
+- Edge case testing for agent behaviors and system limits
+- Comprehensive test runners for different test categories
+
+**Key Implementation Files:**
+- `src/escape_room_sim/competitive/` - Trust tracking, resource management, scenario generation
+- `src/escape_room_sim/simulation/relationship_tracker.py` - Agent relationship dynamics
+- `src/escape_room_sim/simulation/survival_memory.py` - Persistent learning system
+- `tests/run_all_tests.py` - Comprehensive test execution with detailed reporting
