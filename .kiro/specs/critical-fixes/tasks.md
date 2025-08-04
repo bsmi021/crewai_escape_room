@@ -125,8 +125,14 @@
     - Create export_data method for persistence support
     - _Requirements: 2.5, 2.6_
 
-- [ ] 4. Implement SurvivalMemoryBank class with TDD methodology
-  - [ ] 4.1 Create failing tests for SurvivalMemoryBank in new test file
+- [x] 4. Implement SurvivalMemoryBank class with TDD methodology
+
+
+
+
+  - [x] 4.1 Create failing tests for SurvivalMemoryBank in new test file
+
+
     - Create tests/unit/test_survival_memory.py following existing test patterns
     - Use pytest fixtures and AAA pattern from existing tests
     - Test SurvivalMemoryBank instantiation with default survival principles
@@ -134,7 +140,9 @@
     - Test record_successful_strategy stores moderate importance experiences (0.7)
     - _Requirements: 3.1, 3.2, 3.3_
 
-  - [ ] 4.2 Implement SurvivalMemoryBank constructor and experience recording
+  - [x] 4.2 Implement SurvivalMemoryBank constructor and experience recording
+
+
     - Create src/escape_room_sim/simulation/survival_memory.py
     - Implement SurvivalMemoryBank class with default survival principles
     - Implement record_close_call method with importance score 0.9
@@ -142,25 +150,31 @@
     - Create internal data structures for experience storage
     - _Requirements: 3.1, 3.2, 3.3_
 
-  - [ ] 4.3 Create failing tests for threat assessment functionality
+  - [x] 4.3 Create failing tests for threat assessment functionality
+
+
     - Test assess_current_threat returns ThreatAssessment with severity and probability
     - Test threat assessment uses historical experience data
     - Test mitigation strategies are based on past successes
     - _Requirements: 3.4_
 
-  - [ ] 4.4 Implement threat assessment methods to pass tests
+  - [x] 4.4 Implement threat assessment methods to pass tests
+
     - Write assess_current_threat method that analyzes historical patterns
     - Create ThreatAssessment dataclass with required fields
     - Implement logic to extract mitigation strategies from past experiences
     - _Requirements: 3.4_
 
-  - [ ] 4.5 Create failing tests for experience retrieval and probability calculation
+  - [x] 4.5 Create failing tests for experience retrieval and probability calculation
+
+
     - Test get_relevant_experiences returns up to 5 most important experiences
     - Test calculate_survival_probability returns value between 0.1 and 0.9
     - Test survival probability calculation uses historical success rates
     - _Requirements: 3.5, 3.6_
 
-  - [ ] 4.6 Implement experience analysis and probability methods to pass tests
+  - [x] 4.6 Implement experience analysis and probability methods to pass tests
+
     - Write get_relevant_experiences method with importance-based sorting
     - Implement calculate_survival_probability using historical data
     - Create export_data method for persistence support

@@ -1,5 +1,5 @@
 """
-Unit tests for missing context generation functions in iterative_engine.py.
+Unit tests for context generation functions in simulation_engine.py.
 
 These tests are designed to fail initially since the functions don't exist yet.
 They follow the existing test patterns and use fixtures from conftest.py.
@@ -11,17 +11,17 @@ from typing import Dict, List, Any
 
 # Import context generation functions
 try:
-    from src.escape_room_sim.simulation.iterative_engine import get_strategist_context_for_iteration
+    from src.escape_room_sim.simulation.simulation_engine import get_strategist_context_for_iteration
 except ImportError:
     get_strategist_context_for_iteration = None
 
 try:
-    from src.escape_room_sim.simulation.iterative_engine import get_mediator_context_for_iteration
+    from src.escape_room_sim.simulation.simulation_engine import get_mediator_context_for_iteration
 except ImportError:
     get_mediator_context_for_iteration = None
 
 try:
-    from src.escape_room_sim.simulation.iterative_engine import get_survivor_context_for_iteration
+    from src.escape_room_sim.simulation.simulation_engine import get_survivor_context_for_iteration
 except ImportError:
     get_survivor_context_for_iteration = None
 

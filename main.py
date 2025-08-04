@@ -16,7 +16,7 @@ from rich.text import Text
 # Add src to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from escape_room_sim.simulation.simple_engine import SimpleEscapeSimulation, SimulationConfig
+from escape_room_sim.simulation.simulation_engine import EscapeRoomSimulation, SimulationConfig
 from escape_room_sim.utils.llm_config import validate_gemini_configuration
 
 console = Console()
@@ -109,7 +109,7 @@ def main():
         os.makedirs(data_dir, exist_ok=True)
         
         # Initialize and run simulation
-        simulation = SimpleEscapeSimulation(config=config, data_dir=data_dir)
+        simulation = EscapeRoomSimulation(config=config, data_dir=data_dir)
         
         console.print(f"\n[bold green]Starting Iterative Escape Room Simulation![/bold green]")
         console.print(f"[dim]Press Ctrl+C at any time to stop the simulation...[/dim]\n")
