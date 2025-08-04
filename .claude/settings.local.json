@@ -13,7 +13,11 @@
       "Bash(venv/Scripts/python.exe main.py:*)",
       "Bash(venv/Scripts/pip.exe install:*)",
       "mcp__Ref__ref_search_documentation",
-      "mcp__Ref__ref_read_url"
+      "mcp__Ref__ref_read_url",
+      "Bash(find:*)",
+      "Bash(dir:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }
