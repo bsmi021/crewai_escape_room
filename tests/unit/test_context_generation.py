@@ -9,17 +9,20 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from typing import Dict, List, Any
 
-# Import will fail initially since functions don't exist
+# Import context generation functions
 try:
-    from src.escape_room_sim.simulation.iterative_engine import (
-        get_strategist_context_for_iteration,
-        get_mediator_context_for_iteration,
-        get_survivor_context_for_iteration
-    )
+    from src.escape_room_sim.simulation.iterative_engine import get_strategist_context_for_iteration
 except ImportError:
-    # Functions don't exist yet - tests will fail as expected
     get_strategist_context_for_iteration = None
+
+try:
+    from src.escape_room_sim.simulation.iterative_engine import get_mediator_context_for_iteration
+except ImportError:
     get_mediator_context_for_iteration = None
+
+try:
+    from src.escape_room_sim.simulation.iterative_engine import get_survivor_context_for_iteration
+except ImportError:
     get_survivor_context_for_iteration = None
 
 

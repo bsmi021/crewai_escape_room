@@ -20,6 +20,487 @@ from ..memory.persistent_memory import IterativeMemoryManager
 from ..room.escape_room_state import EscapeRoomState
 
 
+def get_strategist_context_for_iteration(
+    iteration_num: int, 
+    previous_failures: Optional[List[str]], 
+    current_resources: Optional[Dict[str, Any]]
+) -> str:
+    """
+    Generate iteration-specific context for the Strategist agent.
+    
+    Args:
+        iteration_num: Current iteration number
+        previous_failures: List of previously failed strategies
+        current_resources: Dictionary of current available resources
+        
+    Returns:
+        Formatted context string for strategic analysis
+    """
+    # Handle None parameters gracefully
+    if previous_failures is None:
+        previous_failures = []
+    if current_resources is None:
+        current_resources = {}
+    
+    context_parts = [
+        f"STRATEGIST CONTEXT - ITERATION {iteration_num}",
+        "=" * 50,
+        "",
+        "STRATEGIC ANALYSIS FOCUS:",
+        f"• This is iteration {iteration_num} of the escape room challenge",
+        f"• You are the analytical problem-solver of the team",
+        f"• Your role is to provide systematic, logical analysis",
+        ""
+    ]
+    
+    # Add previous failures analysis
+    if previous_failures:
+        context_parts.extend([
+            "PREVIOUS STRATEGY FAILURES TO LEARN FROM:",
+            ""
+        ])
+        for i, failure in enumerate(previous_failures[:5], 1):  # Limit to 5 most recent
+            context_parts.append(f"{i}. {failure}")
+        context_parts.extend([
+            "",
+            "KEY LEARNING POINTS:",
+            "• Analyze why these strategies failed",
+            "• Identify patterns in unsuccessful approaches", 
+            "• Avoid repeating the same mistakes",
+            ""
+        ])
+    else:
+        context_parts.extend([
+            "FIRST ITERATION ANALYSIS:",
+            "• No previous failures to learn from",
+            "• Focus on comprehensive initial assessment",
+            "• Establish baseline strategic approach",
+            ""
+        ])
+    
+    # Add current resources information
+    if current_resources:
+        context_parts.extend([
+            "CURRENT RESOURCE STATUS:",
+            ""
+        ])
+        for resource, value in current_resources.items():
+            if isinstance(value, (list, tuple)):
+                context_parts.append(f"• {resource.title()}: {', '.join(map(str, value))}")
+            else:
+                context_parts.append(f"• {resource.title()}: {value}")
+        context_parts.extend([
+            "",
+            "RESOURCE OPTIMIZATION:",
+            "• Consider how to best utilize available resources",
+            "• Identify resource constraints and bottlenecks",
+            "• Plan resource allocation for maximum effectiveness",
+            ""
+        ])
+    else:
+        context_parts.extend([
+            "RESOURCE STATUS: Limited information available",
+            "• Conduct thorough resource assessment",
+            "• Identify what resources are needed",
+            "• Plan resource discovery and acquisition",
+            ""
+        ])
+    
+    # Add strategic priorities
+    context_parts.extend([
+        "STRATEGIC PRIORITIES FOR THIS ITERATION:",
+        "• Conduct systematic analysis of current situation",
+        "• Develop multiple strategic options with risk assessments",
+        "• Provide clear recommendations with probability estimates",
+        "• Consider both short-term tactics and long-term strategy",
+        "• Ensure all analysis is actionable and specific",
+        "",
+        "EXPECTED DELIVERABLES:",
+        "• Comprehensive situation assessment",
+        "• Ranked list of strategic options",
+        "• Risk analysis for each proposed approach",
+        "• Clear recommendation for team action",
+        "",
+        "Remember: Your analytical approach is crucial for team success.",
+        "Be thorough but decisive. Time is limited."
+    ])
+    
+    return "\n".join(context_parts)
+
+
+def get_mediator_context_for_iteration(
+    iteration_num: int,
+    relationship_tracker: Optional[Any],
+    team_stress_level: float,
+    previous_conflicts: Optional[List[str]]
+) -> str:
+    """
+    Generate iteration-specific context for the Mediator agent.
+    
+    Args:
+        iteration_num: Current iteration number
+        relationship_tracker: RelationshipTracker instance (can be None)
+        team_stress_level: Current team stress level (0.0 to 1.0)
+        previous_conflicts: List of previous team conflicts
+        
+    Returns:
+        Formatted context string for mediation and team dynamics
+    """
+    # Handle None parameters gracefully
+    if previous_conflicts is None:
+        previous_conflicts = []
+    
+    context_parts = [
+        f"MEDIATOR CONTEXT - ITERATION {iteration_num}",
+        "=" * 50,
+        "",
+        "TEAM FACILITATION FOCUS:",
+        f"• This is iteration {iteration_num} of the escape room challenge",
+        f"• You are the diplomatic coordinator and team facilitator",
+        f"• Your role is to maintain team cohesion and resolve conflicts",
+        f"• Current team stress level: {team_stress_level:.2f} (0.0=calm, 1.0=critical)",
+        ""
+    ]
+    
+    # Add stress level analysis
+    if team_stress_level >= 0.8:
+        context_parts.extend([
+            "⚠️  CRITICAL STRESS LEVEL ALERT:",
+            "• Team is under extreme pressure - immediate intervention needed",
+            "• Focus on calming techniques and stress reduction",
+            "• Prevent team breakdown and maintain communication",
+            "• Consider shorter-term, less risky approaches",
+            ""
+        ])
+    elif team_stress_level >= 0.6:
+        context_parts.extend([
+            "⚠️  HIGH STRESS LEVEL WARNING:",
+            "• Team stress is elevated - monitor carefully",
+            "• Encourage breaks and positive reinforcement",
+            "• Watch for signs of conflict or frustration",
+            "• Maintain optimistic but realistic outlook",
+            ""
+        ])
+    elif team_stress_level >= 0.4:
+        context_parts.extend([
+            "MODERATE STRESS LEVEL:",
+            "• Team is experiencing normal challenge stress",
+            "• Continue supportive facilitation",
+            "• Encourage open communication",
+            "• Build on team strengths and successes",
+            ""
+        ])
+    else:
+        context_parts.extend([
+            "LOW STRESS LEVEL:",
+            "• Team is relatively calm and focused",
+            "• Maintain positive team dynamics",
+            "• Encourage creative problem-solving",
+            "• Foster collaborative decision-making",
+            ""
+        ])
+    
+    # Add relationship tracker information
+    if relationship_tracker is not None:
+        try:
+            # Try to get relationship summary
+            if hasattr(relationship_tracker, 'get_summary'):
+                relationship_summary = relationship_tracker.get_summary()
+                context_parts.extend([
+                    "CURRENT TEAM RELATIONSHIPS:",
+                    f"• {relationship_summary}",
+                    ""
+                ])
+            
+            # Try to get team cohesion
+            if hasattr(relationship_tracker, 'get_team_cohesion'):
+                try:
+                    cohesion = relationship_tracker.get_team_cohesion()
+                    context_parts.extend([
+                        f"TEAM COHESION LEVEL: {cohesion:.2f}",
+                        "• Use this information to guide team interactions",
+                        "• Focus on strengthening weak relationships",
+                        ""
+                    ])
+                except:
+                    # Handle case where get_team_cohesion needs parameters
+                    context_parts.extend([
+                        "TEAM COHESION: Available for analysis",
+                        "• Monitor relationship dynamics closely",
+                        ""
+                    ])
+        except Exception:
+            context_parts.extend([
+                "RELATIONSHIP TRACKING: Available but limited data",
+                "• Focus on observing and improving team dynamics",
+                ""
+            ])
+    else:
+        context_parts.extend([
+            "RELATIONSHIP TRACKING: Not available",
+            "• Rely on direct observation of team interactions",
+            "• Pay attention to verbal and non-verbal cues",
+            "• Build rapport and trust through active listening",
+            ""
+        ])
+    
+    # Add previous conflicts analysis
+    if previous_conflicts:
+        context_parts.extend([
+            "PREVIOUS TEAM CONFLICTS TO ADDRESS:",
+            ""
+        ])
+        for i, conflict in enumerate(previous_conflicts[:5], 1):  # Limit to 5 most recent
+            context_parts.append(f"{i}. {conflict}")
+        context_parts.extend([
+            "",
+            "CONFLICT RESOLUTION PRIORITIES:",
+            "• Address unresolved tensions from previous conflicts",
+            "• Prevent similar conflicts from recurring",
+            "• Rebuild trust where it may have been damaged",
+            "• Focus on shared goals and common ground",
+            ""
+        ])
+    else:
+        context_parts.extend([
+            "CONFLICT STATUS: No major previous conflicts recorded",
+            "• Maintain positive team atmosphere",
+            "• Prevent conflicts before they escalate",
+            "• Foster collaborative problem-solving",
+            ""
+        ])
+    
+    # Add mediation priorities
+    context_parts.extend([
+        "MEDIATION PRIORITIES FOR THIS ITERATION:",
+        "• Facilitate productive discussion between all team members",
+        "• Ensure every voice is heard and valued",
+        "• Guide the team toward consensus on strategy",
+        "• Monitor emotional state and intervene if needed",
+        "• Maintain focus on shared survival goals",
+        "• Bridge differences in opinion or approach",
+        "",
+        "TEAM DYNAMICS MANAGEMENT:",
+        "• Encourage active participation from quieter members",
+        "• Manage dominant personalities constructively",
+        "• Translate between different communication styles",
+        "• Build on individual strengths for team benefit",
+        "",
+        "EXPECTED DELIVERABLES:",
+        "• Clear team consensus on chosen approach",
+        "• Commitment from all members to the agreed strategy",
+        "• Maintained or improved team relationships",
+        "• Effective conflict resolution if issues arise",
+        "",
+        "Remember: Your diplomatic skills are essential for team success.",
+        "Unity and collaboration will determine survival."
+    ])
+    
+    return "\n".join(context_parts)
+
+
+def get_survivor_context_for_iteration(
+    iteration_num: int,
+    survival_memory: Optional[Any],
+    current_threat_level: float,
+    resource_status: Optional[Dict[str, Any]]
+) -> str:
+    """
+    Generate iteration-specific context for the Survivor agent.
+    
+    Args:
+        iteration_num: Current iteration number
+        survival_memory: SurvivalMemoryBank instance (can be None)
+        current_threat_level: Current threat assessment (0.0 to 1.0)
+        resource_status: Dictionary of current resource status
+        
+    Returns:
+        Formatted context string for survival decision-making
+    """
+    # Handle None parameters gracefully
+    if resource_status is None:
+        resource_status = {}
+    
+    context_parts = [
+        f"SURVIVOR CONTEXT - ITERATION {iteration_num}",
+        "=" * 50,
+        "",
+        "SURVIVAL EXECUTION FOCUS:",
+        f"• This is iteration {iteration_num} of the escape room challenge",
+        f"• You are the pragmatic decision-maker and action executor",
+        f"• Your role is to make tough survival decisions and execute plans",
+        f"• Current threat level: {current_threat_level:.2f} (0.0=safe, 1.0=critical)",
+        ""
+    ]
+    
+    # Add threat level analysis
+    if current_threat_level >= 0.9:
+        context_parts.extend([
+            "🚨 CRITICAL THREAT LEVEL - IMMEDIATE ACTION REQUIRED:",
+            "• Situation is life-threatening - act decisively now",
+            "• Override group consensus if necessary for survival",
+            "• Focus on immediate escape options, not perfect solutions",
+            "• Time for discussion has passed - execution is everything",
+            "• Prepare for worst-case scenarios and emergency measures",
+            ""
+        ])
+    elif current_threat_level >= 0.7:
+        context_parts.extend([
+            "⚠️  HIGH THREAT LEVEL - URGENT ACTION NEEDED:",
+            "• Danger is significant and increasing",
+            "• Prioritize speed over perfection in execution",
+            "• Be ready to make unilateral survival decisions",
+            "• Focus on proven strategies over experimental approaches",
+            "• Monitor situation closely for rapid deterioration",
+            ""
+        ])
+    elif current_threat_level >= 0.5:
+        context_parts.extend([
+            "⚠️  MODERATE THREAT LEVEL - CAREFUL EXECUTION:",
+            "• Situation requires caution but allows for planning",
+            "• Balance team input with decisive action",
+            "• Prepare contingency plans for threat escalation",
+            "• Focus on sustainable approaches with backup options",
+            ""
+        ])
+    elif current_threat_level >= 0.3:
+        context_parts.extend([
+            "LOW-MODERATE THREAT LEVEL - STRATEGIC EXECUTION:",
+            "• Situation is manageable with proper planning",
+            "• Collaborate with team while maintaining readiness",
+            "• Use this time to prepare for potential threats",
+            "• Focus on thorough execution of chosen strategy",
+            ""
+        ])
+    else:
+        context_parts.extend([
+            "LOW THREAT LEVEL - METHODICAL APPROACH:",
+            "• Situation allows for careful, collaborative execution",
+            "• Take time to do things right the first time",
+            "• Build team confidence through successful actions",
+            "• Prepare for future challenges while addressing current ones",
+            ""
+        ])
+    
+    # Add survival memory information
+    if survival_memory is not None:
+        try:
+            # Try to get relevant experiences
+            if hasattr(survival_memory, 'get_relevant_experiences'):
+                try:
+                    experiences = survival_memory.get_relevant_experiences(5)
+                    if experiences and experiences.strip():
+                        context_parts.extend([
+                            "SURVIVAL MEMORY - RELEVANT PAST EXPERIENCES:",
+                            f"• {experiences}",
+                            "",
+                            "LESSONS FROM EXPERIENCE:",
+                            "• Apply successful strategies from similar situations",
+                            "• Avoid repeating actions that led to close calls",
+                            "• Trust your survival instincts based on past learning",
+                            ""
+                        ])
+                    else:
+                        context_parts.extend([
+                            "SURVIVAL MEMORY: Limited past experiences available",
+                            "• Rely on basic survival principles",
+                            "• Document this experience for future learning",
+                            ""
+                        ])
+                except:
+                    context_parts.extend([
+                        "SURVIVAL MEMORY: Available but access limited",
+                        "• Use general survival principles",
+                        ""
+                    ])
+            
+            # Try to get survival probability
+            if hasattr(survival_memory, 'calculate_survival_probability'):
+                try:
+                    # This might need parameters, so we'll handle gracefully
+                    context_parts.extend([
+                        "SURVIVAL PROBABILITY ANALYSIS: Available for decision-making",
+                        "• Use historical data to assess action success rates",
+                        ""
+                    ])
+                except:
+                    pass
+        except Exception:
+            context_parts.extend([
+                "SURVIVAL MEMORY: Available but limited functionality",
+                "• Focus on immediate survival priorities",
+                ""
+            ])
+    else:
+        context_parts.extend([
+            "SURVIVAL MEMORY: Not available",
+            "• Rely on basic survival instincts and logic",
+            "• Make decisions based on immediate situation assessment",
+            "• Document experiences for potential future use",
+            ""
+        ])
+    
+    # Add resource status analysis
+    if resource_status:
+        context_parts.extend([
+            "CURRENT RESOURCE STATUS:",
+            ""
+        ])
+        for resource, status in resource_status.items():
+            if isinstance(status, (list, tuple)):
+                context_parts.append(f"• {resource}: {', '.join(map(str, status))}")
+            elif isinstance(status, dict):
+                context_parts.append(f"• {resource}: {status}")
+            else:
+                context_parts.append(f"• {resource}: {status}")
+        
+        context_parts.extend([
+            "",
+            "RESOURCE MANAGEMENT PRIORITIES:",
+            "• Conserve critical resources for essential actions",
+            "• Identify resource bottlenecks that could prevent escape",
+            "• Plan resource usage for maximum survival benefit",
+            "• Be prepared to sacrifice non-essential resources",
+            ""
+        ])
+    else:
+        context_parts.extend([
+            "RESOURCE STATUS: Limited information available",
+            "• Conduct immediate resource assessment",
+            "• Identify what resources are available and needed",
+            "• Plan resource acquisition and conservation",
+            ""
+        ])
+    
+    # Add survival execution priorities
+    context_parts.extend([
+        "SURVIVAL EXECUTION PRIORITIES FOR THIS ITERATION:",
+        "• Execute the agreed strategy with precision and urgency",
+        "• Monitor progress continuously and adapt as needed",
+        "• Make critical decisions when team consensus isn't possible",
+        "• Prioritize actions that maximize survival probability",
+        "• Be prepared to override plans if survival is at stake",
+        "• Focus on practical, actionable steps over theoretical solutions",
+        "",
+        "DECISION-MAKING FRAMEWORK:",
+        "• Speed vs. Safety: Balance based on current threat level",
+        "• Individual vs. Group: Prioritize group survival when possible",
+        "• Risk vs. Reward: Take calculated risks for significant gains",
+        "• Known vs. Unknown: Prefer proven approaches under high threat",
+        "",
+        "EXPECTED DELIVERABLES:",
+        "• Clear execution of the chosen strategy",
+        "• Real-time assessment of progress and obstacles",
+        "• Critical survival decisions when needed",
+        "• Determination of success/failure and next steps",
+        "",
+        "Remember: Your survival instincts and decisive action are crucial.",
+        "When others hesitate, you must act. Lives depend on your choices."
+    ])
+    
+    return "\n".join(context_parts)
+
+
 @dataclass
 class IterationResult:
     """Represents the result of a single simulation iteration."""

@@ -5,44 +5,62 @@
 
 
 
+
   - Add test cases to existing test files for missing context generation functions
   - Create new test files for RelationshipTracker and SurvivalMemoryBank classes
   - Utilize existing fixtures from conftest.py for consistent test patterns
   - Follow existing mock patterns for CrewAI dependencies
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 2. Implement context generation functions with TDD approach
-  - [ ] 2.1 Create failing tests for get_strategist_context_for_iteration function
+- [x] 2. Implement context generation functions with TDD approach
+
+
+
+
+
+  - [x] 2.1 Create failing tests for get_strategist_context_for_iteration function
+
+
     - Write test that calls function with various parameter combinations
     - Test edge cases like empty lists and None values
     - Verify output format contains required sections (iteration number, failures, resources)
     - _Requirements: 1.1_
 
-  - [ ] 2.2 Implement get_strategist_context_for_iteration function to pass tests
+  - [x] 2.2 Implement get_strategist_context_for_iteration function to pass tests
+
+
     - Write function that takes iteration_num, previous_failures, current_resources parameters
     - Return formatted string with strategic analysis context
     - Handle edge cases identified in tests
     - _Requirements: 1.1_
 
-  - [ ] 2.3 Create failing tests for get_mediator_context_for_iteration function
+  - [x] 2.3 Create failing tests for get_mediator_context_for_iteration function
+
+
     - Write test that calls function with relationship tracker and team dynamics
     - Test with mock RelationshipTracker object
     - Verify output includes team dynamics and stress level information
     - _Requirements: 1.2_
 
-  - [ ] 2.4 Implement get_mediator_context_for_iteration function to pass tests
+  - [x] 2.4 Implement get_mediator_context_for_iteration function to pass tests
+
+
     - Write function that takes iteration_num, relationship_tracker, team_stress_level, previous_conflicts
     - Return formatted string with mediation context
     - Handle None relationship_tracker gracefully
     - _Requirements: 1.2_
 
-  - [ ] 2.5 Create failing tests for get_survivor_context_for_iteration function
+  - [x] 2.5 Create failing tests for get_survivor_context_for_iteration function
+
+
     - Write test that calls function with survival memory and threat assessment
     - Test with mock SurvivalMemoryBank object
     - Verify output includes threat level and survival priorities
     - _Requirements: 1.3_
 
-  - [ ] 2.6 Implement get_survivor_context_for_iteration function to pass tests
+  - [x] 2.6 Implement get_survivor_context_for_iteration function to pass tests
+
+
     - Write function that takes iteration_num, survival_memory, current_threat_level, resource_status
     - Return formatted string with survival context
     - Handle None survival_memory gracefully
