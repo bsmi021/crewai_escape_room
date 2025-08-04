@@ -701,3 +701,69 @@ class ChoiceConsequences:
             summary_parts.append(f"Consequences: {', '.join(self.consequences_triggered)}")
         
         return " | ".join(summary_parts)
+
+
+@dataclass
+class EscapeResult:
+    """Result of an escape attempt in the competitive scenario."""
+    success: bool
+    agent_id: str
+    escape_method: str
+    failure_reason: Optional[str] = None
+    time_remaining: int = 0
+    resources_used: List[str] = field(default_factory=list)
+    information_used: List[str] = field(default_factory=list)
+    timestamp: datetime = field(default_factory=datetime.now)
+    
+    def was_successful(self) -> bool:
+        """Check if the escape attempt was successful."""
+        return self.success
+    
+    def get_failure_reason(self) -> str:
+        """Get human-readable failure reason."""
+        return self.failure_reason or "Unknown failure"
+    
+    def get_resources_summary(self) -> str:
+        """Get summary of resources used in attempt."""
+        if not self.resources_used:
+            return "No resources used"
+        return f"Resources: {', '.join(self.resources_used)}"
+    
+    def get_information_summary(self) -> str:
+        """Get summary of information used in attempt."""
+        if not self.information_used:
+            return "No information used"
+        return f"Information: {', '.join(self.information_used)}"
+
+
+@dataclass 
+class ClaimResult:
+    """Result of a resource claim attempt in the competitive scenario."""
+    success: bool
+    agent_id: str
+    resource_id: str
+    failure_reason: Optional[str] = None
+    previous_owner: Optional[str] = None
+    timestamp: datetime = field(default_factory=datetime.now)
+    
+    def was_successful(self) -> bool:
+        """Check if the resource claim was successful."""
+        return self.success
+    
+    def get_failure_reason(self) -> str:
+        """Get human-readable failure reason."""
+        return self.failure_reason or "Unknown failure"
+    
+    def was_contested(self) -> bool:
+        """Check if this resource was claimed from another agent."""
+        return self.previous_owner is not None
+    
+    def get_claim_summary(self) -> str:
+        """Get summary of the claim attempt."""
+        if self.success:
+            if self.was_contested():
+                return f"{self.agent_id} claimed {self.resource_id} from {self.previous_owner}"
+            else:
+                return f"{self.agent_id} claimed {self.resource_id}"
+        else:
+            return f"{self.agent_id} failed to claim {self.resource_id}: {self.get_failure_reason()}"

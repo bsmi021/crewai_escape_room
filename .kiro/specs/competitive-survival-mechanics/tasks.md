@@ -80,7 +80,7 @@
   - Refactor to add comprehensive ethical burden calculation and choice tracking
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 6. Build InformationBroker for knowledge asymmetry using TDD
+- [x] 6. Build InformationBroker for knowledge asymmetry using TDD
   - Write failing tests for InformationBroker initialization with secret information list
   - Write failing tests for reveal_secret method granting agent access to information
   - Write failing tests for share_information method handling inter-agent knowledge transfer
@@ -93,7 +93,7 @@
   - Refactor to add comprehensive information asymmetry and sharing risk management
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 7. Create CompetitiveEscapeRoom orchestrator using TDD
+- [x] 7. Create CompetitiveEscapeRoom orchestrator using TDD
   - Write failing tests for CompetitiveEscapeRoom initialization integrating all subsystems
   - Write failing tests for attempt_escape method with single-survivor enforcement
   - Write failing tests for process_resource_claim method handling resource acquisition
@@ -106,7 +106,7 @@
   - Refactor to add comprehensive time pressure mechanics and subsystem integration
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 8. Extend agent personalities for competitive behavior using TDD
+- [x] 8. Extend agent personalities for competitive behavior using TDD
   - Write failing tests for Strategist agent exhibiting analytical paralysis under pressure
   - Write failing tests for Mediator agent showing naive trust and manipulation vulnerability
   - Write failing tests for Survivor agent prioritizing self-preservation over cooperation
