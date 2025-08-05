@@ -1,0 +1,155 @@
+@startuml Mesa_CrewAI_System_Overview
+!define RECTANGLE class
+
+title Mesa-CrewAI Hybrid Architecture - System Overview
+
+package "Mesa Framework Layer" as mesa #lightblue {
+  RECTANGLE "Mesa Model" as mesa_model {
+    + Spatial Environment
+    + Agent Positioning  
+    + Physics Simulation
+    + Resource Management
+    + Time Management
+  }
+  
+  RECTANGLE "Mesa Scheduler" as mesa_scheduler {
+    + Agent Activation
+    + Step Coordination
+    + Time Progression
+  }
+  
+  RECTANGLE "Mesa DataCollector" as mesa_collector {
+    + Performance Metrics
+    + Agent State Tracking
+    + Simulation Analytics
+  }
+}
+
+package "CrewAI Framework Layer" as crewai #lightgreen {
+  RECTANGLE "CrewAI Agents" as crewai_agents {
+    + LLM-Powered Reasoning
+    + Natural Language Processing
+    + Task Management
+    + Memory Systems
+  }
+  
+  RECTANGLE "CrewAI Tasks" as crewai_tasks {
+    + Dynamic Task Creation
+    + Context Management
+    + Goal Tracking
+  }
+  
+  RECTANGLE "CrewAI Tools" as crewai_tools {
+    + Environment Interaction
+    + Decision Validation
+    + Action Execution
+  }
+}
+
+package "Hybrid Integration Layer" as hybrid #lightyellow {
+  RECTANGLE "HybridSimulationEngine" as engine {
+    + Orchestration
+    + State Synchronization
+    + Error Handling
+    + Performance Monitoring
+  }
+  
+  RECTANGLE "PerceptionPipeline" as perception {
+    + Mesa State Extraction
+    + Spatial Data Processing
+    + Natural Language Formatting
+  }
+  
+  RECTANGLE "DecisionEngine" as decision {
+    + LLM Prompt Generation
+    + Response Processing
+    + Decision Validation
+  }
+  
+  RECTANGLE "ActionTranslator" as translator {
+    + Decision Parsing
+    + Mesa Action Generation
+    + Parameter Validation
+  }
+  
+  RECTANGLE "UnifiedStateManager" as state {
+    + State Synchronization
+    + Conflict Resolution
+    + Change Propagation
+  }
+}
+
+package "External Services" as external #lightcoral {
+  RECTANGLE "LLM APIs" as llm {
+    + Google Gemini
+    + OpenAI GPT
+    + Anthropic Claude
+  }
+  
+  RECTANGLE "Monitoring" as monitoring {
+    + Prometheus Metrics
+    + Grafana Dashboards
+    + Alert Manager
+  }
+  
+  RECTANGLE "Caching" as cache {
+    + Redis Cache
+    + Connection Pooling
+    + Response Caching
+  }
+}
+
+' System Integration Flows
+mesa_model --> engine : "Mesa State Updates"
+engine --> perception : "Extract Perceptions"
+perception --> decision : "Formatted Context"
+decision --> crewai_agents : "LLM Reasoning"
+crewai_agents --> decision : "Agent Decisions"
+decision --> translator : "Parsed Decisions"
+translator --> mesa_model : "Mesa Actions"
+
+' State Management
+engine --> state : "State Changes"
+state --> mesa_model : "Sync Mesa State"
+state --> crewai_agents : "Sync CrewAI State"
+
+' External Service Integration
+decision --> llm : "LLM API Calls"
+llm --> decision : "LLM Responses"
+engine --> monitoring : "Performance Metrics"
+decision --> cache : "Cache Responses"
+cache --> decision : "Cached Results"
+
+' Scheduler Integration
+mesa_scheduler --> engine : "Step Trigger"
+engine --> mesa_scheduler : "Step Complete"
+
+' Data Collection
+mesa_collector --> engine : "Collect Metrics"
+engine --> mesa_collector : "Hybrid Metrics"
+
+note right of engine
+  **Central Orchestrator**
+  - Coordinates Mesa and CrewAI
+  - Manages complete simulation lifecycle
+  - Handles errors and performance optimization
+  - Maintains state consistency
+end note
+
+note right of perception
+  **Mesa → CrewAI Bridge**
+  - Extracts relevant perceptions from Mesa
+  - Formats data for LLM consumption
+  - Filters based on agent capabilities
+  - Optimizes for performance
+end note
+
+note right of translator
+  **CrewAI → Mesa Bridge**  
+  - Parses natural language decisions
+  - Validates action legality
+  - Generates Mesa-compatible actions
+  - Handles edge cases gracefully
+end note
+
+@enduml

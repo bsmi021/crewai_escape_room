@@ -1,0 +1,262 @@
+@startuml Mesa_CrewAI_Deployment_Architecture
+!include <kubernetes/k8s-sprites-unlabeled-25pct>
+title Mesa-CrewAI Hybrid Architecture - Deployment Options
+
+package "Development Environment" as dev #lightblue {
+  node "Developer Machine" as dev_machine {
+    component "Single Process" as single_process {
+      [HybridSimulationEngine]
+      [Mesa Model]
+      [CrewAI Agents]
+      [Local Cache]
+    }
+    
+    database "SQLite" as dev_db
+    component "Local LLM" as local_llm {
+      [Ollama/Local Model]
+    }
+    
+    single_process --> dev_db
+    single_process --> local_llm
+  }
+  
+  note right of dev_machine
+    **Development Configuration**
+    - Single process execution
+    - 4GB RAM, 4 CPU cores
+    - SQLite for persistence
+    - Local LLM for testing
+    - File-based caching
+  end note
+}
+
+package "Production Environment - Single Server" as prod_single #lightgreen {
+  node "Production Server" as prod_server {
+    component "Hybrid Application" as hybrid_app {
+      [HybridSimulationEngine] as engine_prod
+      [Mesa Components] as mesa_prod
+      [CrewAI Components] as crewai_prod
+      [State Management] as state_prod
+    }
+    
+    component "Monitoring Stack" as monitor_stack {
+      [Prometheus]
+      [Grafana]
+      [AlertManager]
+    }
+    
+    hybrid_app --> monitor_stack
+  }
+  
+  database "PostgreSQL" as postgres
+  database "Redis Cluster" as redis
+  cloud "LLM APIs" as llm_apis {
+    [Google Gemini]
+    [OpenAI GPT]
+    [Anthropic Claude]
+  }
+  
+  hybrid_app --> postgres
+  hybrid_app --> redis
+  hybrid_app --> llm_apis
+  
+  note right of prod_server
+    **Production Single Server**
+    - 16GB RAM, 8 CPU cores
+    - PostgreSQL for persistence
+    - Redis for caching
+    - External LLM APIs
+    - Full monitoring stack
+  end note
+}
+
+package "Production Environment - Kubernetes Cluster" as k8s #lightyellow {
+  node "Kubernetes Cluster" as k8s_cluster {
+    component "Application Pods" as app_pods {
+      [Hybrid Engine Pod 1] as engine1
+      [Hybrid Engine Pod 2] as engine2
+      [Hybrid Engine Pod N] as engineN
+    }
+    
+    component "State Management Pods" as state_pods {
+      [State Synchronizer Pod 1] as sync1
+      [State Synchronizer Pod 2] as sync2
+    }
+    
+    component "Support Services" as support_services {
+      [Load Balancer] as lb
+      [Service Mesh] as mesh
+      [Config Manager] as config
+      [Secret Manager] as secrets
+    }
+    
+    component "Monitoring & Observability" as k8s_monitoring {
+      [Prometheus Operator]
+      [Grafana Dashboards]
+      [Jaeger Tracing]
+      [ELK Stack]
+    }
+    
+    lb --> app_pods
+    mesh --> app_pods
+    mesh --> state_pods
+    config --> app_pods
+    secrets --> app_pods
+  }
+  
+  database "PostgreSQL Cluster" as pg_cluster {
+    [Primary DB]
+    [Read Replica 1]
+    [Read Replica 2]
+  }
+  
+  database "Redis Cluster" as redis_cluster {
+    [Redis Master 1]
+    [Redis Master 2]
+    [Redis Master 3]
+    [Redis Slaves]
+  }
+  
+  cloud "External Services" as external_services {
+    [Google Gemini API]
+    [OpenAI API] 
+    [Anthropic API]
+    [Monitoring SaaS]
+  }
+  
+  k8s_cluster --> pg_cluster
+  k8s_cluster --> redis_cluster
+  k8s_cluster --> external_services
+  
+  note right of k8s_cluster
+    **Kubernetes Production**
+    - Auto-scaling based on load
+    - 200+ concurrent simulations
+    - High availability setup
+    - Service mesh communication
+    - Comprehensive observability
+  end note
+}
+
+package "Edge/Distributed Deployment" as edge #lightcoral {
+  node "Edge Location 1" as edge1 {
+    [Lightweight Engine]
+    [Local State Cache]
+  }
+  
+  node "Edge Location 2" as edge2 {
+    [Lightweight Engine]  
+    [Local State Cache]
+  }
+  
+  node "Central Coordination Hub" as hub {
+    [State Aggregator]
+    [Global Configuration]
+    [Load Balancer]
+  }
+  
+  edge1 --> hub
+  edge2 --> hub
+  hub --> external_services
+  
+  note right of edge1
+    **Edge Deployment**
+    - Low-latency local processing
+    - Reduced bandwidth usage
+    - Fault-tolerant design
+    - Central state coordination
+  end note
+}
+
+' Scaling Relationships
+dev_machine ..> prod_server : "Scale Up"
+prod_server ..> k8s_cluster : "Scale Out"
+k8s_cluster ..> edge : "Distribute"
+
+' Configuration Management
+package "Configuration Management" as config_mgmt #lightpink {
+  [Development Config] as dev_config
+  [Staging Config] as staging_config  
+  [Production Config] as prod_config
+  [Edge Config] as edge_config
+  
+  component "Environment Variables" as env_vars {
+    LLM_API_KEYS
+    DATABASE_URLS
+    CACHE_SETTINGS
+    MONITORING_CONFIG
+    PERFORMANCE_TUNING
+  }
+  
+  dev_config --> env_vars
+  staging_config --> env_vars
+  prod_config --> env_vars
+  edge_config --> env_vars
+}
+
+' Network Architecture
+package "Network & Security" as network #lightgray {
+  component "Load Balancing" as load_balance {
+    [Application Load Balancer]
+    [Network Load Balancer]
+    [Global Load Balancer]
+  }
+  
+  component "Security" as security {
+    [TLS Termination]
+    [JWT Authentication]
+    [Rate Limiting]
+    [DDoS Protection]
+  }
+  
+  component "Service Mesh" as service_mesh {
+    [Istio/Linkerd]
+    [mTLS Communication]
+    [Circuit Breakers]
+    [Retry Policies]
+  }
+  
+  load_balance --> security
+  security --> service_mesh
+}
+
+' Resource Requirements Table
+note as resource_table
+  **Resource Requirements by Environment**
+  
+  | Environment | CPU | Memory | Storage | Network |
+  |-------------|-----|--------|---------|---------|
+  | Development | 4 cores | 4GB | 100GB SSD | 100Mbps |
+  | Production Single | 8 cores | 16GB | 500GB SSD | 1Gbps |
+  | Production K8s Node | 16 cores | 64GB | 1TB NVMe | 10Gbps |
+  | Edge Location | 2 cores | 8GB | 200GB SSD | 500Mbps |
+  
+  **Scaling Targets**
+  - Development: 1-3 agents, 10 simulations
+  - Production Single: 10-20 agents, 100 simulations  
+  - Production K8s: 200+ agents, 1000+ simulations
+  - Edge: 5-10 agents, 50 simulations per location
+end note
+
+' Deployment Pipeline
+package "CI/CD Pipeline" as cicd #lavender {
+  [Git Repository] --> [Build Pipeline]
+  [Build Pipeline] --> [Unit Tests]
+  [Unit Tests] --> [Integration Tests]  
+  [Integration Tests] --> [Security Scans]
+  [Security Scans] --> [Container Build]
+  [Container Build] --> [Staging Deployment]
+  [Staging Deployment] --> [End-to-End Tests]
+  [End-to-End Tests] --> [Production Deployment]
+  
+  note right of cicd
+    **Deployment Strategy**
+    - Blue-green deployments
+    - Canary releases
+    - Automated rollbacks
+    - Performance validation
+    - Security compliance
+  end note
+}
+
+@enduml

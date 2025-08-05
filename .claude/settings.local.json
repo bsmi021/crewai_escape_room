@@ -17,7 +17,8 @@
       "Bash(find:*)",
       "Bash(dir:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(pip show:*)"
     ],
     "deny": []
   }

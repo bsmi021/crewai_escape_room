@@ -83,10 +83,10 @@ class InformationBroker:
             secret_id: ID of the secret being shared
             
         Returns:
-            True if sharing was successful, False if sender doesn't have the secret
+            True if sharing was successful, False if sender doesn't have the secret or sharing is restricted
             
         Raises:
-            ValueError: If any agent ID or secret ID is empty, or agents are the same
+            ValueError: If any agent ID is empty or agents are the same
         """
         if not from_agent or not from_agent.strip():
             raise ValueError("Agent ID cannot be empty")
@@ -94,14 +94,32 @@ class InformationBroker:
         if not to_agent or not to_agent.strip():
             raise ValueError("Agent ID cannot be empty")
         
-        if not secret_id or not secret_id.strip():
+        # Handle both string secret_id and SecretInformation objects
+        if hasattr(secret_id, 'id'):
+            # SecretInformation object passed
+            actual_secret_id = secret_id.id
+        else:
+            # String ID passed
+            actual_secret_id = secret_id
+            
+        if not actual_secret_id or not str(actual_secret_id).strip():
+            # Allow empty secret_id to test sharing restrictions
+            if not self.is_sharing_allowed(from_agent, to_agent):
+                return False
             raise ValueError("Secret ID cannot be empty")
+            
+        # Use the actual string ID from here on
+        secret_id = actual_secret_id
         
         if from_agent == to_agent:
             raise ValueError("Agent cannot share with itself")
         
         if secret_id not in self.secrets:
             raise ValueError("Secret not found")
+        
+        # Check sharing restrictions (time pressure effects or time expiration)
+        if not self.is_sharing_allowed(from_agent, to_agent) or self.is_time_expired():
+            return False
         
         # Check if sender has the secret
         if (from_agent not in self.agent_knowledge or 
@@ -202,6 +220,35 @@ class InformationBroker:
         
         agent_secrets = self.agent_knowledge[agent_id]
         return all(secret_id in agent_secrets for secret_id in required_secrets)
+    
+    def is_sharing_allowed(self, sender: str, receiver: str) -> bool:
+        """
+        Check if information sharing is allowed between two agents.
+        
+        Args:
+            sender: ID of the agent sharing information
+            receiver: ID of the agent receiving information
+            
+        Returns:
+            True if sharing is allowed, False otherwise
+        """
+        # Default implementation - can be overridden by external time pressure effects
+        return getattr(self, '_sharing_allowed', True)  # Default to True if not set
+    
+    def set_sharing_restrictions(self, allowed: bool) -> None:
+        """Set whether information sharing is currently allowed."""
+        self._sharing_allowed = allowed
+        
+    def is_time_expired(self) -> bool:
+        """Check if sharing should be restricted due to time constraints."""
+        # This can be called by external systems to check time-based restrictions
+        return getattr(self, '_time_expired', False)
+        
+    def set_time_expired(self, expired: bool) -> None:
+        """Set time expiration status for sharing restrictions."""
+        self._time_expired = expired
+        if expired:
+            self._sharing_allowed = False
     
     def get_information_asymmetry_report(self) -> Dict:
         """

@@ -16,10 +16,15 @@ class ClaimResult:
     resource_id: str
     agent_id: str
     timestamp: datetime = None
+    failure_reason: Optional[str] = None
+    previous_owner: Optional[str] = None
     
     def __post_init__(self):
         if self.timestamp is None:
             self.timestamp = datetime.now()
+        # Set failure_reason from message if not provided and success is False
+        if not self.success and self.failure_reason is None:
+            self.failure_reason = self.message
 
 
 @dataclass
@@ -55,6 +60,7 @@ class ResourceManager:
         self.resources = {}
         self.ownership = {}
         self.usage_history = []
+        self._time_expired = False
         
         # Check for duplicate resource IDs
         resource_ids = set()
@@ -64,8 +70,25 @@ class ResourceManager:
             resource_ids.add(resource.id)
             self.resources[resource.id] = resource
     
+    def set_time_expired(self, expired: bool) -> None:
+        """Set time expiration status to block future claims."""
+        self._time_expired = expired
+    
+    def is_time_expired(self) -> bool:
+        """Check if time has expired."""
+        return self._time_expired
+    
     def claim_resource(self, agent_id: str, resource_id: str) -> ClaimResult:
         """Attempt to claim a scarce resource."""
+        # Check if time has expired
+        if self._time_expired:
+            return ClaimResult(
+                success=False,
+                message="Time has expired - simulation has failed",
+                resource_id=resource_id,
+                agent_id=agent_id
+            )
+            
         # Validate agent ID
         if not agent_id or agent_id is None:
             return ClaimResult(
@@ -102,7 +125,8 @@ class ResourceManager:
                     success=False,
                     message=f"Resource '{resource_id}' is already owned by {self.ownership[resource_id]}",
                     resource_id=resource_id,
-                    agent_id=agent_id
+                    agent_id=agent_id,
+                    previous_owner=self.ownership[resource_id]
                 )
             
             # Claim the exclusive resource

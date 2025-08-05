@@ -1,0 +1,201 @@
+# Mesa-CrewAI Hybrid Architecture Dependencies
+# This file contains all dependencies required for the hybrid architecture
+
+# Core Hybrid Framework Dependencies
+mesa>=2.1.5                    # Agent-based modeling framework
+crewai>=0.15.0                 # LLM-powered agent framework
+langchain-community>=0.0.21    # LangChain integrations
+numpy>=1.26.0                  # Numerical computing for Mesa
+
+# LLM API Support
+openai>=1.97.0                 # OpenAI API client
+anthropic>=0.25.0              # Anthropic Claude API
+google-generativeai>=0.3.0     # Google Gemini API
+langchain-ollama>=0.1.3        # Local LLM support via Ollama
+
+# Async and Concurrency Support
+aiohttp>=3.9.0                 # Async HTTP client for API calls
+asyncio-throttle>=1.0.2        # Rate limiting for async operations
+tenacity>=8.2.0                # Retry mechanisms with exponential backoff
+
+# Data Processing and Serialization
+pydantic>=2.11.0               # Data validation for hybrid state
+pydantic-settings>=2.0.0       # Configuration management
+msgpack>=1.0.7                 # Fast binary serialization
+orjson>=3.9.10                 # Fast JSON processing
+
+# Caching and Performance
+redis>=5.0.0                   # Optional Redis backend for caching
+lru-dict>=1.3.0                # LRU cache implementation
+cachetools>=5.3.0              # Caching utilities
+
+# State Management and Persistence
+sqlalchemy>=2.0.0              # Optional database backend for state
+sqlite3                        # Lightweight database (built-in)
+pickle5>=0.0.12; python_version<"3.8"  # Enhanced pickling for older Python
+
+# Configuration and Environment
+python-dotenv>=1.0.0           # Environment variable management
+pyyaml>=6.0.1                  # YAML configuration files
+toml>=0.10.2                   # TOML configuration support
+
+# Monitoring and Observability
+prometheus-client>=0.19.0      # Metrics collection
+structlog>=23.2.0              # Structured logging
+psutil>=5.9.6                  # System resource monitoring
+memory-profiler>=0.61.0        # Memory usage profiling
+
+# Testing Framework
+pytest>=8.0.0                  # Core testing framework
+pytest-asyncio>=0.24.0         # Async test support
+pytest-cov>=4.0.0              # Coverage reporting
+pytest-mock>=3.12.0            # Mocking utilities
+pytest-benchmark>=4.0.0        # Performance benchmarking
+hypothesis>=6.92.0              # Property-based testing
+faker>=20.1.0                  # Test data generation
+
+# Development Tools
+black>=24.0.0                  # Code formatting
+flake8>=7.0.0                  # Linting
+mypy>=1.8.0                    # Type checking
+isort>=5.13.0                  # Import sorting
+pre-commit>=3.6.0              # Git hooks
+
+# Documentation
+sphinx>=7.2.0                  # Documentation generation
+sphinx-rtd-theme>=2.0.0        # ReadTheDocs theme
+myst-parser>=2.0.0             # Markdown support for Sphinx
+
+# Scientific Computing (for advanced Mesa features)
+scipy>=1.11.0                  # Scientific computing
+matplotlib>=3.8.0              # Plotting and visualization
+networkx>=3.2.0                # Graph algorithms
+pandas>=2.1.0                  # Data manipulation
+
+# Visualization and GUI (optional)
+mesa-viz-tornado>=0.1.2        # Mesa visualization server
+plotly>=5.17.0                 # Interactive plotting
+bokeh>=3.3.0                   # Web-based visualization
+
+# Machine Learning (for advanced agent behaviors)
+scikit-learn>=1.3.0            # Traditional ML algorithms
+transformers>=4.35.0           # Hugging Face transformers (optional)
+torch>=2.1.0                   # PyTorch for neural networks (optional)
+
+# Security and Encryption
+cryptography>=41.0.0           # Cryptographic operations
+bcrypt>=4.1.0                  # Password hashing
+pyjwt>=2.8.0                   # JSON Web Tokens
+
+# Networking and Communication
+websockets>=12.0               # WebSocket support for real-time communication
+zmq>=0.0.0                     # ZeroMQ for distributed systems (optional)
+
+# Serialization Formats
+protobuf>=4.25.0               # Protocol Buffers
+avro>=1.11.0                   # Apache Avro serialization
+msgspec>=0.18.0                # High-performance serialization
+
+# Geographic and Spatial (for spatial Mesa models)
+shapely>=2.0.0                 # Geometric operations
+geopandas>=0.14.0              # Geographic data processing
+rtree>=1.1.0                   # Spatial indexing
+
+# Time Series and Temporal Analysis
+arrow>=1.3.0                   # Better datetime handling
+pytz>=2023.3                   # Timezone support
+croniter>=2.0.0                # Cron expression parsing
+
+# Utilities
+click>=8.1.0                   # Command-line interface creation
+rich>=13.7.0                   # Rich text and beautiful formatting
+tqdm>=4.66.0                   # Progress bars
+colorama>=0.4.6                # Cross-platform colored terminal text
+
+# Optional Dependencies for Advanced Features
+# Uncomment as needed:
+
+# Distributed Computing
+# celery>=5.3.0                # Distributed task queue
+# dask>=2023.12.0              # Parallel computing
+
+# Database Connectors  
+# psycopg2-binary>=2.9.0       # PostgreSQL adapter
+# pymongo>=4.6.0               # MongoDB driver
+# cassandra-driver>=3.29.0     # Cassandra driver
+
+# Cloud Integration
+# boto3>=1.34.0                # AWS SDK
+# google-cloud-storage>=2.10.0 # Google Cloud Storage
+# azure-storage-blob>=12.19.0  # Azure Blob Storage
+
+# Message Queues
+# pika>=1.3.0                  # RabbitMQ client
+# kafka-python>=2.0.0         # Apache Kafka client
+
+# Specialized ML/AI
+# gymnasium>=0.29.0           # Reinforcement learning environments
+# stable-baselines3>=2.2.0    # RL algorithms
+# ray>=2.8.0                  # Distributed ML
+
+# Development Dependencies (install with pip install -e ".[dev]")
+[dev]
+pytest>=8.0.0
+pytest-asyncio>=0.24.0
+pytest-cov>=4.0.0
+pytest-mock>=3.12.0
+pytest-benchmark>=4.0.0
+black>=24.0.0
+flake8>=7.0.0
+mypy>=1.8.0
+isort>=5.13.0
+pre-commit>=3.6.0
+hypothesis>=6.92.0
+memory-profiler>=0.61.0
+
+# Documentation Dependencies
+[docs]
+sphinx>=7.2.0
+sphinx-rtd-theme>=2.0.0
+myst-parser>=2.0.0
+sphinx-autodoc-typehints>=1.25.0
+
+# Performance Dependencies
+[performance]
+redis>=5.0.0
+cachetools>=5.3.0
+msgpack>=1.0.7
+orjson>=3.9.10
+lru-dict>=1.3.0
+
+# Visualization Dependencies
+[viz]
+mesa-viz-tornado>=0.1.2
+plotly>=5.17.0
+bokeh>=3.3.0
+matplotlib>=3.8.0
+
+# ML Dependencies
+[ml]
+scikit-learn>=1.3.0
+transformers>=4.35.0
+torch>=2.1.0
+gymnasium>=0.29.0
+
+# Distributed Dependencies
+[distributed]
+celery>=5.3.0
+redis>=5.0.0
+dask>=2023.12.0
+
+# Database Dependencies
+[database]
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+pymongo>=4.6.0
+
+# Cloud Dependencies
+[cloud]
+boto3>=1.34.0
+google-cloud-storage>=2.10.0
+azure-storage-blob>=12.19.0

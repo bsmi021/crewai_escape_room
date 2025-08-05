@@ -1,0 +1,206 @@
+@startuml Mesa_CrewAI_Data_Flow_Sequence
+title Mesa-CrewAI Hybrid Architecture - Complete Simulation Step Sequence
+
+actor "Simulation Controller" as controller
+participant "HybridSimulationEngine" as engine
+participant "Mesa Model" as mesa
+participant "PerceptionPipeline" as perception
+participant "DecisionEngine" as decision
+participant "LLM API" as llm
+participant "ActionTranslator" as translator
+participant "StateSynchronizer" as sync
+participant "CrewAI Agent" as crewai
+participant "ErrorHandler" as error
+participant "PerformanceMonitor" as monitor
+
+== Simulation Step Initialization ==
+controller -> engine : step()
+activate engine
+
+engine -> monitor : start_step_timing()
+activate monitor
+
+engine -> mesa : get_current_state()
+activate mesa
+mesa --> engine : MesaState
+deactivate mesa
+
+== State Synchronization Check ==
+engine -> sync : validate_state_consistency()
+activate sync
+sync -> sync : check_mesa_crewai_sync()
+alt State Inconsistency Detected
+    sync -> sync : resolve_conflicts()
+    sync -> engine : state_conflicts_resolved
+else State Consistent
+    sync -> engine : state_valid
+end
+deactivate sync
+
+== Perception Extraction Phase ==
+loop For Each Active Agent
+    engine -> perception : extract_perceptions(mesa_model, agent_id)
+    activate perception
+    
+    perception -> mesa : get_agent_position(agent_id)
+    mesa --> perception : Position(x, y)
+    
+    perception -> mesa : get_nearby_objects(position, radius)
+    mesa --> perception : List[GameObject]
+    
+    perception -> mesa : get_available_actions(agent_id)
+    mesa --> perception : List[ActionType]
+    
+    perception -> perception : format_for_llm(spatial_data, objects, actions)
+    perception --> engine : PerceptionData
+    deactivate perception
+    
+    == Decision Making Phase ==
+    engine -> decision : make_decision(perception_data, agent_id)
+    activate decision
+    
+    decision -> decision : generate_llm_prompt(perception_data)
+    decision -> llm : async_llm_call(prompt, agent_config)
+    activate llm
+    
+    alt LLM Success
+        llm --> decision : llm_response
+        decision -> decision : parse_response(llm_response)
+        decision -> decision : validate_decision(parsed_decision)
+        decision --> engine : DecisionData
+    else LLM Failure
+        llm --> decision : LLMError
+        decision -> error : handle_llm_error(error, agent_id)
+        activate error
+        error -> error : get_fallback_decision(agent_id, context)
+        error --> decision : FallbackDecision
+        deactivate error
+        decision --> engine : DecisionData(fallback=true)
+    end
+    deactivate llm
+    deactivate decision
+    
+    == Action Translation Phase ==
+    engine -> translator : translate_decision(decision_data)
+    activate translator
+    
+    translator -> translator : parse_action_intent(decision_data)
+    translator -> translator : extract_parameters(decision_data)
+    translator -> mesa : validate_action_legality(action, current_state)
+    mesa --> translator : validation_result
+    
+    alt Action Valid
+        translator --> engine : MesaAction
+    else Action Invalid  
+        translator -> error : handle_invalid_action(action, agent_id)
+        activate error
+        error -> error : generate_fallback_action(agent_id)
+        error --> translator : FallbackAction
+        deactivate error
+        translator --> engine : MesaAction(fallback=true)
+    end
+    deactivate translator
+    
+    == Action Execution ==
+    engine -> mesa : execute_action(mesa_action)
+    activate mesa
+    mesa -> mesa : update_agent_position()
+    mesa -> mesa : update_environment_state()
+    mesa -> mesa : check_action_consequences()
+    mesa --> engine : ActionResult
+    deactivate mesa
+    
+    == CrewAI State Update ==
+    engine -> crewai : update_agent_memory(action_result, perception_data)
+    activate crewai
+    crewai -> crewai : store_experience(perception, decision, result)
+    crewai -> crewai : update_task_progress()
+    crewai --> engine : memory_updated
+    deactivate crewai
+end
+
+== Post-Step State Synchronization ==
+engine -> sync : synchronize_post_step(mesa_state, crewai_states)
+activate sync
+
+sync -> sync : extract_mesa_changes()
+sync -> sync : extract_crewai_changes()
+sync -> sync : merge_state_changes()
+
+alt Merge Conflicts Detected
+    sync -> sync : resolve_merge_conflicts()
+    sync -> engine : conflicts_resolved
+else No Conflicts
+    sync -> engine : states_synchronized
+end
+deactivate sync
+
+== Performance Monitoring ==
+engine -> monitor : record_step_metrics(step_data)
+monitor -> monitor : calculate_step_latency()
+monitor -> monitor : track_llm_performance()
+monitor -> monitor : analyze_bottlenecks()
+
+alt Performance Issues Detected
+    monitor -> engine : performance_warning(bottlenecks)
+    engine -> engine : apply_optimization_hints()
+else Performance Normal
+    monitor -> engine : performance_ok
+end
+deactivate monitor
+
+== Error Handling & Recovery ==
+alt Any Step Errors
+    engine -> error : handle_step_error(error_details)
+    activate error
+    error -> error : classify_error_severity()
+    error -> error : determine_recovery_strategy()
+    
+    alt Critical Error
+        error -> engine : simulation_halt_required
+        engine -> controller : SimulationError(critical=true)
+    else Recoverable Error
+        error -> error : execute_recovery_strategy()
+        error -> engine : error_recovered
+    end
+    deactivate error
+end
+
+== Step Completion ==
+engine -> engine : finalize_step()
+engine -> controller : StepResult(success=true, metrics=step_metrics)
+deactivate engine
+
+== Async Background Tasks ==
+note over engine, monitor
+  **Concurrent Background Processes**
+  - Performance metric aggregation
+  - State consistency validation
+  - Cache maintenance and cleanup
+  - Health check monitoring
+  - Resource usage optimization
+end note
+
+== Performance Timing Breakdown ==
+note right of monitor
+  **Target Step Performance**
+  - Mesa state extraction: ~10-50ms
+  - Perception processing: ~5-20ms
+  - LLM reasoning: ~500-3000ms (cached/batched)
+  - Action translation: ~1-5ms
+  - Mesa action execution: ~5-15ms
+  - State synchronization: ~5-15ms
+  - **Total target: <1 second (p95)**
+end note
+
+== Error Recovery Strategies ==
+note left of error
+  **Error Types & Recovery**
+  - LLM API timeout → Fallback decision
+  - Mesa action invalid → Alternative action
+  - State sync conflict → Conflict resolution
+  - Memory exhaustion → Garbage collection
+  - Network partition → Offline mode
+end note
+
+@enduml

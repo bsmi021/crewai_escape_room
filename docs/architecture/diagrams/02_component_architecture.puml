@@ -1,0 +1,280 @@
+@startuml Mesa_CrewAI_Component_Architecture
+!define INTERFACE interface
+
+title Mesa-CrewAI Hybrid Architecture - Component Architecture
+
+package "Core Interfaces" as interfaces #lightgray {
+  INTERFACE IPerceptionPipeline {
+    + extract_perceptions(mesa_model: MesaModel) : PerceptionData
+    + format_for_llm(perception: PerceptionData) : str
+    + get_performance_metrics() : Dict
+  }
+  
+  INTERFACE IDecisionEngine {
+    + make_decision(context: str, agent_id: str) : DecisionData
+    + validate_decision(decision: DecisionData) : bool
+    + get_confidence_score(decision: DecisionData) : float
+  }
+  
+  INTERFACE IActionTranslator {
+    + translate_decision(decision: DecisionData) : MesaAction
+    + validate_action(action: MesaAction, model: MesaModel) : bool
+    + get_fallback_action(agent_id: str) : MesaAction
+  }
+  
+  INTERFACE IStateSynchronizer {
+    + synchronize_state(unified_state: UnifiedState) : void
+    + handle_conflict(conflicts: List[StateConflict]) : Resolution
+    + validate_consistency() : bool
+  }
+}
+
+package "Data Models" as models #lightblue {
+  class PerceptionData {
+    + agent_id: str
+    + timestamp: datetime
+    + spatial_data: SpatialPerception
+    + resource_data: ResourcePerception
+    + social_data: SocialPerception
+    + environmental_data: EnvironmentPerception
+    --
+    + to_natural_language() : str
+    + validate() : bool
+    + get_hash() : str
+  }
+  
+  class DecisionData {
+    + agent_id: str
+    + decision_text: str
+    + confidence: float
+    + reasoning: str
+    + parameters: Dict[str, Any]
+    + timestamp: datetime
+    --
+    + parse_action_intent() : ActionIntent
+    + validate_parameters() : bool
+    + get_fallback_options() : List[str]
+  }
+  
+  class MesaAction {
+    + action_type: ActionType
+    + agent_id: str
+    + parameters: Dict[str, Any]
+    + priority: int
+    + validation_rules: List[Rule]
+    --
+    + execute(model: MesaModel) : ActionResult
+    + validate_legality(model: MesaModel) : bool
+    + estimate_cost() : float
+  }
+  
+  enum ActionType {
+    MOVE
+    INTERACT
+    COMMUNICATE
+    PICKUP
+    DROP
+    EXAMINE
+    WAIT
+    CUSTOM
+  }
+  
+  class UnifiedState {
+    + mesa_state: MesaState
+    + crewai_state: CrewAIState
+    + timestamp: datetime
+    + version: int
+    + change_log: List[StateChange]
+    --
+    + merge_states() : void
+    + detect_conflicts() : List[StateConflict]
+    + rollback_to_version(version: int) : void
+  }
+}
+
+package "Hybrid Components" as hybrid #lightyellow {
+  class HybridAgent {
+    + mesa_agent: MesaAgent
+    + crewai_agent: CrewAIAgent
+    + state_bridge: StateBridge
+    + performance_tracker: PerformanceTracker
+    --
+    + step() : void
+    + perceive() : PerceptionData
+    + decide(perception: PerceptionData) : DecisionData
+    + act(decision: DecisionData) : ActionResult
+    + synchronize_state() : void
+  }
+  
+  class HybridSimulationEngine {
+    + mesa_model: MesaModel
+    + crewai_crew: CrewAICrew
+    + perception_pipeline: IPerceptionPipeline
+    + decision_engine: IDecisionEngine
+    + action_translator: IActionTranslator
+    + state_synchronizer: IStateSynchronizer
+    + error_handler: ErrorHandler
+    + performance_monitor: PerformanceMonitor
+    --
+    + initialize() : void
+    + step() : SimulationResult
+    + run(max_steps: int) : FinalResult
+    + handle_error(error: Exception) : void
+    + get_metrics() : PerformanceMetrics
+  }
+  
+  class StateBridge {
+    + mesa_state_adapter: MesaStateAdapter
+    + crewai_state_adapter: CrewAIStateAdapter
+    + conflict_resolver: ConflictResolver
+    --
+    + extract_mesa_state() : MesaState
+    + extract_crewai_state() : CrewAIState
+    + merge_states(mesa: MesaState, crewai: CrewAIState) : UnifiedState
+    + resolve_conflicts(conflicts: List[StateConflict]) : Resolution
+  }
+}
+
+package "Concrete Implementations" as concrete #lightgreen {
+  class EscapeRoomPerceptionPipeline {
+    + spatial_indexer: SpatialIndexer
+    + resource_tracker: ResourceTracker
+    + social_analyzer: SocialAnalyzer
+    + cache: PerceptionCache
+    --
+    + extract_spatial_perceptions(model: MesaModel) : SpatialData
+    + extract_resource_perceptions(model: MesaModel) : ResourceData
+    + extract_social_perceptions(model: MesaModel) : SocialData
+    + optimize_for_agent(perception: PerceptionData, agent_id: str) : PerceptionData
+  }
+  
+  class CrewAIDecisionEngine {
+    + llm_client: LLMClient
+    + prompt_generator: PromptGenerator
+    + response_parser: ResponseParser
+    + confidence_estimator: ConfidenceEstimator
+    + cache: DecisionCache
+    --
+    + generate_prompt(context: str, agent: CrewAIAgent) : str
+    + call_llm(prompt: str) : str
+    + parse_response(response: str) : DecisionData
+    + estimate_confidence(decision: DecisionData, context: str) : float
+  }
+  
+  class EscapeRoomActionTranslator {
+    + action_parser: ActionParser
+    + parameter_extractor: ParameterExtractor
+    + validator: ActionValidator
+    + fallback_generator: FallbackGenerator
+    --
+    + parse_movement_action(decision: DecisionData) : MoveAction
+    + parse_interaction_action(decision: DecisionData) : InteractAction
+    + validate_action_legality(action: MesaAction, model: MesaModel) : bool
+    + generate_fallback(agent_id: str, context: str) : MesaAction
+  }
+  
+  class AsyncStateSynchronizer {
+    + event_bus: EventBus
+    + state_store: StateStore
+    + conflict_resolver: ConflictResolver
+    + change_tracker: ChangeTracker
+    --
+    + async synchronize_async(state: UnifiedState) : void
+    + handle_state_change_event(event: StateChangeEvent) : void
+    + resolve_merge_conflicts(conflicts: List[StateConflict]) : void
+    + maintain_state_consistency() : void
+  }
+}
+
+package "Support Systems" as support #lightcoral {
+  class ErrorHandler {
+    + circuit_breaker: CircuitBreaker
+    + retry_policy: RetryPolicy
+    + fallback_provider: FallbackProvider
+    + error_classifier: ErrorClassifier
+    --
+    + handle_llm_error(error: LLMError) : ErrorResponse
+    + handle_mesa_error(error: MesaError) : ErrorResponse
+    + handle_sync_error(error: SyncError) : ErrorResponse
+    + classify_error_severity(error: Exception) : Severity
+  }
+  
+  class PerformanceMonitor {
+    + metrics_collector: MetricsCollector
+    + performance_analyzer: PerformanceAnalyzer
+    + bottleneck_detector: BottleneckDetector
+    + optimization_recommender: OptimizationRecommender
+    --
+    + track_step_performance(step_data: StepData) : void
+    + analyze_performance_trends() : PerformanceTrends
+    + detect_bottlenecks() : List[Bottleneck]
+    + recommend_optimizations() : List[Optimization]
+  }
+  
+  class ConfigurationManager {
+    + config_validator: ConfigValidator
+    + environment_detector: EnvironmentDetector
+    + secret_manager: SecretManager
+    --
+    + load_configuration(env: Environment) : HybridConfig
+    + validate_config(config: HybridConfig) : ValidationResult
+    + get_llm_config() : LLMConfig
+    + get_mesa_config() : MesaConfig
+  }
+}
+
+' Interface Implementations
+EscapeRoomPerceptionPipeline ..|> IPerceptionPipeline
+CrewAIDecisionEngine ..|> IDecisionEngine
+EscapeRoomActionTranslator ..|> IActionTranslator
+AsyncStateSynchronizer ..|> IStateSynchronizer
+
+' Component Relationships
+HybridSimulationEngine --> IPerceptionPipeline
+HybridSimulationEngine --> IDecisionEngine  
+HybridSimulationEngine --> IActionTranslator
+HybridSimulationEngine --> IStateSynchronizer
+HybridSimulationEngine --> ErrorHandler
+HybridSimulationEngine --> PerformanceMonitor
+HybridSimulationEngine --> ConfigurationManager
+
+HybridAgent --> StateBridge
+HybridAgent --> PerformanceMonitor
+
+' Data Flow
+IPerceptionPipeline --> PerceptionData
+IDecisionEngine --> DecisionData
+IActionTranslator --> MesaAction
+IStateSynchronizer --> UnifiedState
+
+StateBridge --> UnifiedState
+HybridSimulationEngine --> HybridAgent
+
+note right of HybridSimulationEngine
+  **Central Orchestrator**
+  - Manages complete simulation lifecycle
+  - Coordinates all hybrid components
+  - Handles errors gracefully
+  - Monitors performance continuously
+  - Maintains architectural boundaries
+end note
+
+note right of HybridAgent
+  **Mesa-CrewAI Bridge**
+  - Composition over inheritance
+  - Maintains dual agent state
+  - Synchronizes state changes
+  - Tracks individual performance
+  - Handles agent-specific errors
+end note
+
+note bottom of interfaces
+  **Clean Architecture Principles**
+  - Interface segregation
+  - Dependency inversion
+  - Single responsibility
+  - Open/closed principle
+  - Testability through mocking
+end note
+
+@enduml

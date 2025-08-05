@@ -1,0 +1,384 @@
+@startuml Mesa_CrewAI_Class_Relationships
+!define INTERFACE interface
+!define ABSTRACT abstract class
+
+title Mesa-CrewAI Hybrid Architecture - Class Relationships and Design Patterns
+
+' Core Interfaces (Dependency Inversion Principle)
+package "Core Interfaces" as interfaces #lightgray {
+  INTERFACE IPerceptionPipeline <<interface>> {
+    + extract_perceptions(model: MesaModel, agent_id: str) : PerceptionData
+    + format_for_llm(perception: PerceptionData) : str
+    + get_agent_specific_perception(perception: PerceptionData, agent_id: str) : PerceptionData
+    + cache_perception(agent_id: str, perception: PerceptionData) : void
+    + get_performance_metrics() : Dict[str, float]
+  }
+  
+  INTERFACE IDecisionEngine <<interface>> {
+    + make_decision(context: str, agent_id: str, agent_config: AgentConfig) : DecisionData
+    + validate_decision(decision: DecisionData, context: str) : ValidationResult
+    + get_confidence_score(decision: DecisionData) : float
+    + cache_decision(context_hash: str, decision: DecisionData) : void
+    + get_fallback_decision(agent_id: str, error_context: str) : DecisionData
+  }
+  
+  INTERFACE IActionTranslator <<interface>> {
+    + translate_decision(decision: DecisionData, agent_context: AgentContext) : MesaAction
+    + validate_action(action: MesaAction, model: MesaModel) : ValidationResult
+    + get_action_cost(action: MesaAction, model: MesaModel) : float
+    + get_fallback_action(agent_id: str, context: str) : MesaAction
+    + optimize_action_parameters(action: MesaAction, model: MesaModel) : MesaAction
+  }
+  
+  INTERFACE IStateSynchronizer <<interface>> {
+    + synchronize_state(unified_state: UnifiedState) : SynchronizationResult
+    + handle_state_conflict(conflicts: List[StateConflict]) : ConflictResolution
+    + validate_state_consistency(state: UnifiedState) : ConsistencyResult
+    + rollback_to_checkpoint(checkpoint_id: str) : RollbackResult
+    + create_state_checkpoint() : str
+  }
+}
+
+' Abstract Base Classes (Template Method Pattern)
+package "Abstract Classes" as abstracts #lightblue {
+  ABSTRACT BasePerceptionPipeline <<abstract>> {
+    # cache: PerceptionCache
+    # performance_tracker: PerformanceTracker
+    # spatial_indexer: SpatialIndexer
+    --
+    + extract_perceptions(model: MesaModel, agent_id: str) : PerceptionData
+    # extract_spatial_data(model: MesaModel, agent_id: str) : SpatialData {abstract}
+    # extract_resource_data(model: MesaModel, agent_id: str) : ResourceData {abstract}
+    # extract_social_data(model: MesaModel, agent_id: str) : SocialData {abstract}
+    # filter_by_agent_capabilities(data: Any, agent_id: str) : Any
+    # optimize_perception_for_llm(perception: PerceptionData) : PerceptionData
+  }
+  
+  ABSTRACT BaseDecisionEngine <<abstract>> {
+    # llm_client: LLMClient
+    # prompt_generator: PromptGenerator
+    # response_parser: ResponseParser
+    # confidence_estimator: ConfidenceEstimator
+    # decision_cache: DecisionCache
+    --
+    + make_decision(context: str, agent_id: str, agent_config: AgentConfig) : DecisionData
+    # generate_agent_specific_prompt(context: str, agent_config: AgentConfig) : str {abstract}
+    # call_llm_service(prompt: str, agent_config: AgentConfig) : str
+    # parse_llm_response(response: str, agent_id: str) : DecisionData {abstract}
+    # estimate_decision_confidence(decision: DecisionData, context: str) : float
+    # apply_agent_personality_filter(decision: DecisionData, agent_config: AgentConfig) : DecisionData
+  }
+  
+  ABSTRACT BaseActionTranslator <<abstract>> {
+    # action_parser: ActionParser
+    # parameter_extractor: ParameterExtractor
+    # validator: ActionValidator
+    # cost_calculator: CostCalculator
+    --
+    + translate_decision(decision: DecisionData, agent_context: AgentContext) : MesaAction
+    # parse_action_type(decision: DecisionData) : ActionType {abstract}
+    # extract_action_parameters(decision: DecisionData) : Dict[str, Any] {abstract}
+    # validate_action_legality(action: MesaAction, model: MesaModel) : bool
+    # calculate_action_cost(action: MesaAction, model: MesaModel) : float
+    # optimize_parameters(action: MesaAction, model: MesaModel) : MesaAction
+  }
+}
+
+' Concrete Implementations (Strategy Pattern)
+package "Concrete Implementations" as concrete #lightgreen {
+  class EscapeRoomPerceptionPipeline {
+    - room_analyzer: RoomAnalyzer
+    - resource_tracker: ResourceTracker
+    - agent_relationship_tracker: RelationshipTracker
+    --
+    + extract_spatial_data(model: MesaModel, agent_id: str) : SpatialData
+    + extract_resource_data(model: MesaModel, agent_id: str) : ResourceData
+    + extract_social_data(model: MesaModel, agent_id: str) : SocialData
+    - analyze_room_layout(model: MesaModel) : RoomLayout
+    - detect_available_resources(position: Position, radius: float) : List[Resource]
+    - assess_agent_relationships(agent_id: str, nearby_agents: List[str]) : RelationshipData
+  }
+  
+  class CrewAIDecisionEngine {
+    - personality_prompter: PersonalityPrompter
+    - context_formatter: ContextFormatter
+    - decision_validator: DecisionValidator
+    --
+    + generate_agent_specific_prompt(context: str, agent_config: AgentConfig) : str
+    + parse_llm_response(response: str, agent_id: str) : DecisionData
+    - format_strategist_prompt(context: str) : str
+    - format_mediator_prompt(context: str) : str
+    - format_survivor_prompt(context: str) : str
+    - validate_response_format(response: str) : bool
+    - extract_reasoning_chain(response: str) : List[str]
+  }
+  
+  class EscapeRoomActionTranslator {
+    - movement_parser: MovementParser
+    - interaction_parser: InteractionParser
+    - communication_parser: CommunicationParser
+    --
+    + parse_action_type(decision: DecisionData) : ActionType
+    + extract_action_parameters(decision: DecisionData) : Dict[str, Any]
+    - parse_movement_intent(decision: DecisionData) : MovementAction
+    - parse_interaction_intent(decision: DecisionData) : InteractionAction
+    - parse_communication_intent(decision: DecisionData) : CommunicationAction
+    - validate_movement_constraints(action: MovementAction, model: MesaModel) : bool
+    - validate_interaction_prerequisites(action: InteractionAction, model: MesaModel) : bool
+  }
+  
+  class AsyncStateSynchronizer {
+    - event_bus: AsyncEventBus
+    - state_store: StateStore
+    - conflict_resolver: ConflictResolver
+    - consistency_checker: ConsistencyChecker
+    --
+    + synchronize_state(unified_state: UnifiedState) : SynchronizationResult
+    + handle_state_conflict(conflicts: List[StateConflict]) : ConflictResolution
+    - merge_mesa_crewai_states(mesa_state: MesaState, crewai_state: CrewAIState) : UnifiedState
+    - detect_state_conflicts(unified_state: UnifiedState) : List[StateConflict]
+    - resolve_timestamp_conflicts(conflicts: List[StateConflict]) : ConflictResolution
+    - validate_cross_framework_consistency(state: UnifiedState) : bool
+  }
+}
+
+' Data Models (Value Objects)
+package "Data Models" as models #lightyellow {
+  class PerceptionData <<value object>> {
+    + agent_id: str {readonly}
+    + timestamp: datetime {readonly}
+    + spatial_data: SpatialPerception {readonly}
+    + resource_data: ResourcePerception {readonly}
+    + social_data: SocialPerception {readonly}
+    + environmental_data: EnvironmentPerception {readonly}
+    + confidence_score: float {readonly}
+    --
+    + to_natural_language() : str
+    + validate() : ValidationResult
+    + get_context_hash() : str
+    + merge_with(other: PerceptionData) : PerceptionData
+    + filter_by_relevance(threshold: float) : PerceptionData
+  }
+  
+  class DecisionData <<value object>> {
+    + agent_id: str {readonly}
+    + decision_text: str {readonly}
+    + confidence: float {readonly}
+    + reasoning_chain: List[str] {readonly}
+    + parameters: Dict[str, Any] {readonly}
+    + timestamp: datetime {readonly}
+    + fallback: bool {readonly}
+    --
+    + parse_action_intent() : ActionIntent
+    + validate_parameters() : ValidationResult
+    + get_decision_hash() : str
+    + to_json() : str
+    + from_json(json_str: str) : DecisionData {static}
+  }
+  
+  class MesaAction <<value object>> {
+    + action_type: ActionType {readonly}
+    + agent_id: str {readonly}
+    + parameters: Dict[str, Any] {readonly}
+    + priority: int {readonly}
+    + estimated_cost: float {readonly}
+    + validation_rules: List[ValidationRule] {readonly}
+    --
+    + execute(model: MesaModel) : ActionResult
+    + validate_against_model(model: MesaModel) : ValidationResult
+    + get_action_signature() : str
+    + estimate_success_probability(model: MesaModel) : float
+    + optimize_for_model(model: MesaModel) : MesaAction
+  }
+  
+  class UnifiedState <<aggregate root>> {
+    + mesa_state: MesaState {readonly}
+    + crewai_state: CrewAIState {readonly}
+    + synchronization_metadata: SyncMetadata {readonly}
+    + version: int {readonly}
+    + timestamp: datetime {readonly}
+    + change_log: List[StateChange] {readonly}
+    --
+    + is_consistent() : bool
+    + detect_conflicts() : List[StateConflict]
+    + merge_changes(changes: List[StateChange]) : UnifiedState
+    + rollback_changes(change_ids: List[str]) : UnifiedState
+    + create_checkpoint() : StateCheckpoint
+  }
+}
+
+' Core Orchestration (Facade Pattern)
+package "Core Orchestration" as orchestration #lightcoral {
+  class HybridSimulationEngine <<facade>> {
+    - mesa_model: MesaModel
+    - crewai_crew: CrewAICrew
+    - perception_pipeline: IPerceptionPipeline
+    - decision_engine: IDecisionEngine
+    - action_translator: IActionTranslator
+    - state_synchronizer: IStateSynchronizer
+    - error_handler: ErrorHandler
+    - performance_monitor: PerformanceMonitor
+    - configuration: HybridConfig
+    --
+    + initialize(config: HybridConfig) : InitializationResult
+    + step() : SimulationStepResult
+    + run(max_steps: int) : SimulationResult
+    + pause() : void
+    + resume() : void
+    + reset() : void
+    + get_current_state() : UnifiedState
+    + get_performance_metrics() : PerformanceMetrics
+    - orchestrate_simulation_step() : StepResult
+    - handle_step_error(error: Exception, context: StepContext) : ErrorResult
+  }
+  
+  class HybridAgent <<composition>> {
+    - mesa_agent: MesaAgent
+    - crewai_agent: CrewAIAgent
+    - agent_id: str
+    - agent_config: AgentConfig
+    - state_bridge: AgentStateBridge
+    - performance_tracker: AgentPerformanceTracker
+    --
+    + step(simulation_context: SimulationContext) : AgentStepResult
+    + perceive(mesa_model: MesaModel) : PerceptionData
+    + decide(perception: PerceptionData) : DecisionData
+    + act(decision: DecisionData, mesa_model: MesaModel) : ActionResult
+    + synchronize_state() : StateSyncResult
+    + get_agent_metrics() : AgentMetrics
+    - update_crewai_memory(perception: PerceptionData, action_result: ActionResult) : void
+    - update_mesa_state(crewai_updates: CrewAIUpdates) : void
+  }
+}
+
+' Factory Pattern for Component Creation
+package "Factory Pattern" as factories #lightpink {
+  class ComponentFactory <<factory>> {
+    + create_perception_pipeline(config: PipelineConfig) : IPerceptionPipeline {static}
+    + create_decision_engine(config: EngineConfig) : IDecisionEngine {static}
+    + create_action_translator(config: TranslatorConfig) : IActionTranslator {static}
+    + create_state_synchronizer(config: SyncConfig) : IStateSynchronizer {static}
+    + create_hybrid_agent(mesa_agent: MesaAgent, crewai_agent: CrewAIAgent, config: AgentConfig) : HybridAgent {static}
+  }
+  
+  class ConfigurationFactory <<factory>> {
+    + create_development_config() : HybridConfig {static}
+    + create_production_config() : HybridConfig {static}
+    + create_testing_config() : HybridConfig {static}
+    + create_custom_config(overrides: Dict[str, Any]) : HybridConfig {static}
+  }
+}
+
+' Observer Pattern for Monitoring
+package "Observer Pattern" as observers #lavender {
+  INTERFACE IPerformanceObserver <<interface>> {
+    + on_step_completed(metrics: StepMetrics) : void
+    + on_error_occurred(error: ErrorEvent) : void
+    + on_performance_threshold_exceeded(threshold: PerformanceThreshold) : void
+  }
+  
+  class PerformanceMonitor <<subject>> {
+    - observers: List[IPerformanceObserver]
+    - metrics_collector: MetricsCollector
+    - threshold_detector: ThresholdDetector
+    --
+    + add_observer(observer: IPerformanceObserver) : void
+    + remove_observer(observer: IPerformanceObserver) : void
+    + notify_step_completed(metrics: StepMetrics) : void
+    + notify_error_occurred(error: ErrorEvent) : void
+    + notify_threshold_exceeded(threshold: PerformanceThreshold) : void
+  }
+  
+  class PrometheusObserver {
+    + on_step_completed(metrics: StepMetrics) : void
+    + on_error_occurred(error: ErrorEvent) : void
+    + on_performance_threshold_exceeded(threshold: PerformanceThreshold) : void
+  }
+  
+  class LoggingObserver {
+    + on_step_completed(metrics: StepMetrics) : void
+    + on_error_occurred(error: ErrorEvent) : void  
+    + on_performance_threshold_exceeded(threshold: PerformanceThreshold) : void
+  }
+}
+
+' Inheritance Relationships
+BasePerceptionPipeline <|-- EscapeRoomPerceptionPipeline
+BaseDecisionEngine <|-- CrewAIDecisionEngine
+BaseActionTranslator <|-- EscapeRoomActionTranslator
+IStateSynchronizer <|.. AsyncStateSynchronizer
+
+' Interface Implementation
+IPerceptionPipeline <|.. BasePerceptionPipeline
+IDecisionEngine <|.. BaseDecisionEngine
+IActionTranslator <|.. BaseActionTranslator
+IPerformanceObserver <|.. PrometheusObserver
+IPerformanceObserver <|.. LoggingObserver
+
+' Composition Relationships
+HybridSimulationEngine *-- IPerceptionPipeline
+HybridSimulationEngine *-- IDecisionEngine
+HybridSimulationEngine *-- IActionTranslator
+HybridSimulationEngine *-- IStateSynchronizer
+HybridSimulationEngine *-- PerformanceMonitor
+
+HybridAgent *-- AgentStateBridge
+HybridAgent *-- AgentPerformanceTracker
+
+PerformanceMonitor o-- IPerformanceObserver
+
+' Data Flow Dependencies
+IPerceptionPipeline ..> PerceptionData : creates
+IDecisionEngine ..> DecisionData : creates
+IActionTranslator ..> MesaAction : creates
+IStateSynchronizer ..> UnifiedState : manages
+
+' Factory Dependencies
+ComponentFactory ..> IPerceptionPipeline : creates
+ComponentFactory ..> IDecisionEngine : creates
+ComponentFactory ..> IActionTranslator : creates
+ComponentFactory ..> IStateSynchronizer : creates
+ComponentFactory ..> HybridAgent : creates
+
+' Design Pattern Notes
+note right of HybridSimulationEngine
+  **Facade Pattern**
+  - Simplifies complex subsystem interactions
+  - Provides unified interface for client code
+  - Encapsulates orchestration logic
+  - Handles error propagation and recovery
+end note
+
+note right of BasePerceptionPipeline
+  **Template Method Pattern**
+  - Defines algorithm structure in base class
+  - Allows subclasses to override specific steps
+  - Ensures consistent processing pipeline
+  - Promotes code reuse and maintainability
+end note
+
+note right of ComponentFactory
+  **Factory Pattern**
+  - Encapsulates object creation logic
+  - Enables dependency injection
+  - Supports configuration-based creation
+  - Facilitates testing with mock objects
+end note
+
+note right of PerformanceMonitor
+  **Observer Pattern**
+  - Decouples monitoring from core logic  
+  - Enables multiple monitoring strategies
+  - Supports runtime observer addition/removal
+  - Facilitates extensible monitoring system
+end note
+
+note right of HybridAgent
+  **Composition over Inheritance**
+  - Contains Mesa and CrewAI agents
+  - Avoids complex inheritance hierarchies
+  - Enables flexible agent combinations
+  - Maintains clear separation of concerns
+end note
+
+@enduml
